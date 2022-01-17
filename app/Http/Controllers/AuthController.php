@@ -43,15 +43,14 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-
-        $token = $user->createToken('myapptoken')->plainTextToken;
         
         if (!$user || !Hash::check($request->password, $user->password)) {
             $response = [
-                'messege' =>'Login invalid'
+                'messege' =>'Your Email or Password does not Match. Please Try Again'
             ];
-        return response($response, 403);
+            return response($response, 403);
         }
+        $token = $user->createToken('myapptoken')->plainTextToken;
         
         return new UserResource($user,$token);
     }

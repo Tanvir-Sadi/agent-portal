@@ -15,6 +15,7 @@ class Application extends Model implements HasMedia
         'application_id',
         'university_name',
         'course_level',
+        'course_intake',
         'course_name',
         'student_name',
         'student_email',

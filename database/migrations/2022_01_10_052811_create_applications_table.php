@@ -18,6 +18,7 @@ class CreateApplicationsTable extends Migration
             $table->string('application_id')->nullable();
             $table->string('university_name');
             $table->string('course_level');
+            $table->string('course_intake');
             $table->string('course_name');
             $table->string('student_name');
             $table->string('student_email');

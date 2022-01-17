@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Application;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Http\Resources\ApplicationResource;
 
 class ApplicationController extends Controller
 {
@@ -16,9 +17,9 @@ class ApplicationController extends Controller
     public function index()
     {
         if (auth()->user()->roles == 'admin') {
-            return Application::all();
+            return ApplicationResource::collection(Application->orderBy('updated_at','desc')->paginate());
         } else {
-            return auth()->user()->applications()->get();
+            return ApplicationResource::collection(auth()->user()->applications()->orderBy('updated_at','desc')->paginate(6));
         }
     }
 
