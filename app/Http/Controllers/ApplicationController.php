@@ -6,6 +6,8 @@ use App\Models\Application;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Http\Resources\ApplicationResource;
+use App\Http\Resources\MediaResource;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicationController extends Controller
 {
@@ -56,10 +58,22 @@ class ApplicationController extends Controller
         if ($request->hasFile('document')) {
             $application = Application::find($id);
             $application->addMedia($request->document)->toMediaCollection($request->type);
-            return 'Uploaded Successfully';
+            return response()->json('Uploaded Successfully',200);
         }else{
             return response()->json('File Not Found',404);
         }
+    }
+
+    public function getMedia($id)
+    {
+        $application = Application::find($id);
+        return new MediaResource($application);
+    }
+
+    public function downloadMedia(Request $request)
+    {
+        // return $request->name;
+        return Storage::disk('public')->download($request->name);
     }
 
     /**

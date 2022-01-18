@@ -26,6 +26,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('application', ApplicationController::class);
     Route::post('application/{id}/upload', [ApplicationController::class, 'upload']);
+    Route::get('application/{id}/getmedia', [ApplicationController::class, 'getMedia']);
+    Route::post('application/download', [ApplicationController::class, 'downloadMedia']);
 });
 
 Route::prefix('admin')->group(function () {
