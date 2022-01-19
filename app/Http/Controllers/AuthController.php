@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\MediaTypeResource;
 
 class AuthController extends Controller
 {
@@ -77,5 +78,33 @@ class AuthController extends Controller
         $user->status = $request->status;
         $user->save();
         return new UserResource($user,null);
+    }
+
+    public function profile()
+    {
+        return new UserResource(auth()->user(),null);
+    }
+
+    public function getMedia($id)
+    {
+        $user = User::find($id);
+        return MediaTypeResource::collection($user->getMedia());
+    }
+
+    public function uploadMediaAsAgent(Request $request)
+    {
+        if ($request->hasFile('document')) {
+            $user = auth()->user();
+            $user->addMedia($request->document)->toMediaCollection();
+            return response()->json('Uploaded Successfully',200);
+        }else{
+            return response()->json('File Not Found',404);
+        }
+    }
+
+    public function getMediaAsAgent()
+    {
+        $user = auth()->user();
+        return MediaTypeResource::collection($user->getMedia());
     }
 }

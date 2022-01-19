@@ -2,8 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UniversityController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ApplicationController;
@@ -24,9 +24,12 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('uploadasagent', [AuthController::class, 'uploadMediaAsAgent']);
+    Route::get('getasagent', [AuthController::class, 'getMediaAsAgent']);
     Route::resource('application', ApplicationController::class);
     Route::post('application/{id}/upload', [ApplicationController::class, 'upload']);
     Route::get('application/{id}/getmedia', [ApplicationController::class, 'getMedia']);
+    Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('application/download', [ApplicationController::class, 'downloadMedia']);
 });
 
@@ -40,11 +43,6 @@ Route::prefix('admin')->group(function () {
         Route::resource('university', UniversityController::class);
         Route::resource('course', CourseController::class);
     });
-});
-
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
 });
 
 Route::get('/status', function () {
