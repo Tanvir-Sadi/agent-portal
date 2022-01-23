@@ -69,7 +69,12 @@ class AuthController extends Controller
 
     public function agent()
     {
-        return UserResource::collection(User::where('status', 'onhold')->paginate());
+        return UserResource::collection(User::where('status', 'onhold')->orderBy('updated_at','desc')->paginate(6));
+    }
+
+    public function agentVerified()
+    {
+        return UserResource::collection(User::where('status', 'verified')->orderBy('updated_at','desc')->paginate(6));
     }
 
     public function verify(Request $request, $user)
@@ -78,6 +83,12 @@ class AuthController extends Controller
         $user->status = $request->status;
         $user->save();
         return new UserResource($user,null);
+    }
+    public function deleteAgent($id)
+    {
+        $user = User::find($id);
+        $user->delete();
+        return response()->json('Successfully Deleted', 200);
     }
 
     public function profile()

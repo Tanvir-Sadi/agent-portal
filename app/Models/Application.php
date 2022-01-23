@@ -27,7 +27,45 @@ class Application extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
+        $this->addMediaCollection('passport');
+        $this->addMediaCollection('visa');
+        $this->addMediaCollection('nid');
         $this->addMediaCollection('cv');
         $this->addMediaCollection('sop');
+        $this->addMediaCollection('conditional');
+        $this->addMediaCollection('unconditional');
+        $this->addMediaCollection('other');
+    }
+
+    /**
+     * Get the user that owns the Application
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+
+    /**
+     * Get all of the messages for the Application
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+    /**
+     * The statuses that belong to the Application
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function statuses()
+    {
+        return $this->belongsToMany(Status::class)
+        ->withTimestamps()
+        ->withPivot(['status']);
     }
 }

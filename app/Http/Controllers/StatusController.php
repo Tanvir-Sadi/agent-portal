@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ApplicationStatus;
+use App\Models\Status;
 use Illuminate\Http\Request;
 
-class ApplicationStatusController extends Controller
+class StatusController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +14,7 @@ class ApplicationStatusController extends Controller
      */
     public function index()
     {
-        //
+        return Status::all();
     }
 
     /**
@@ -35,16 +35,30 @@ class ApplicationStatusController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $status = Status::insert([
+            ['name'=>'Application Delivered','order'=>1],
+            ['name'=>'Application Submitted','order'=>2],
+            ['name'=>'Conditional Offer Letter Ready','order'=>3],
+            ['name'=>'Unconditional Offer Letter Ready','order'=>4],
+            ['name'=>'Student Payment Done','order'=>5],
+            ['name'=>'University Interview Completed','order'=>6],
+            ['name'=>'CAS Documents','order'=>7],
+            ['name'=>'Apply for VISA','order'=>8],
+        ]
+        );
+
+        return response()->json($status, 201);
+
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\ApplicationStatus  $applicationStatus
+     * @param  \App\Models\Status  $status
      * @return \Illuminate\Http\Response
      */
-    public function show(ApplicationStatus $applicationStatus)
+    public function show(Status $status)
     {
         //
     }
@@ -52,10 +66,10 @@ class ApplicationStatusController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\ApplicationStatus  $applicationStatus
+     * @param  \App\Models\Status  $status
      * @return \Illuminate\Http\Response
      */
-    public function edit(ApplicationStatus $applicationStatus)
+    public function edit(Status $status)
     {
         //
     }
@@ -64,10 +78,10 @@ class ApplicationStatusController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\ApplicationStatus  $applicationStatus
+     * @param  \App\Models\Status  $status
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, ApplicationStatus $applicationStatus)
+    public function update(Request $request, Status $status)
     {
         //
     }
@@ -75,10 +89,10 @@ class ApplicationStatusController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\ApplicationStatus  $applicationStatus
+     * @param  \App\Models\Status  $status
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ApplicationStatus $applicationStatus)
+    public function destroy(Status $status)
     {
         //
     }

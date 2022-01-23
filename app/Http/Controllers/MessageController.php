@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Message;
+use App\Models\Application;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class MessageController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Application $application)
     {
-        
+        return $application->messages()->get();
     }
 
     /**
@@ -33,29 +34,39 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Application $application, Request $request)
     {
-        //
+        $request->validate([
+            'message'=> 'required|string|max:1000',
+            'type'=> 'required|string|max:255',
+            'user'=> 'required|string|max:255',
+        ]);
+        $message = $application->messages()->create([
+            'message' => $request->message,
+            'type' => $request->type,
+            'user' => $request->user
+        ]);
+        return $message;
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\Message  $message
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show(Message $message)
     {
-        //
+        return $message;
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\Message  $message
      * @return \Illuminate\Http\Response
      */
-    public function edit(User $user)
+    public function edit(Message $message)
     {
         //
     }
@@ -64,10 +75,10 @@ class UserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\Message  $message
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, Message $message)
     {
         //
     }
@@ -75,12 +86,11 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\Message  $message
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy(Message $message)
     {
         //
     }
-
 }

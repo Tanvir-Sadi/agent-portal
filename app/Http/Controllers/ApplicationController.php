@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
+use App\Models\Status;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Http\Resources\ApplicationResource;
 use App\Http\Resources\MediaResource;
 use Illuminate\Support\Facades\Storage;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ApplicationController extends Controller
 {
@@ -19,9 +21,18 @@ class ApplicationController extends Controller
     public function index()
     {
         if (auth()->user()->roles == 'admin') {
-            return ApplicationResource::collection(Application->orderBy('updated_at','desc')->paginate());
+            return ApplicationResource::collection( QueryBuilder::for(Application::class)
+            ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake'])
+            ->with('user:id,name')
+            ->orderBy('updated_at','desc')
+            ->paginate(6)
+        );
         } else {
-            return ApplicationResource::collection(auth()->user()->applications()->orderBy('updated_at','desc')->paginate(6));
+            return ApplicationResource::collection( QueryBuilder::for(auth()->user()->applications())
+            ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake'])
+            ->with('user:id,name')
+            ->orderBy('updated_at','desc')
+            ->paginate(6));
         }
     }
 
@@ -48,6 +59,7 @@ class ApplicationController extends Controller
         $application = auth()->user()->applications()->create($request->all());
         $application->application_id = Carbon::now()->year.$application->id;
         $application->save();
+        $application->statuses()->sync(Status::all());
         return $application;
 
     }
@@ -58,6 +70,8 @@ class ApplicationController extends Controller
         if ($request->hasFile('document')) {
             $application = Application::find($id);
             $application->addMedia($request->document)->toMediaCollection($request->type);
+            $application->updated_at=Carbon::now();
+            $application->save();
             return response()->json('Uploaded Successfully',200);
         }else{
             return response()->json('File Not Found',404);
@@ -112,6 +126,23 @@ class ApplicationController extends Controller
         return $application;
     }
 
+    public function viewStatus(Application $application, Status $status)
+    {
+        return $application->statuses()->get();
+    }
+
+    public function updateStatus(Request $request, Application $application, Status $status)
+    {
+        $request->validate([
+            'status' => 'required|boolean'
+        ]);
+
+        // return response()->json($request->status);
+        $application->updated_at=Carbon::now();
+        $application->save();
+        return $application->statuses()->updateExistingPivot($status,['status'=>$request->status]);
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -121,6 +152,6 @@ class ApplicationController extends Controller
     public function destroy(Application $application)
     {
         $application->delete();
-        return 'SuccessFully Deleted';
+        return response()->json('Successfully Deleted', 200);
     }
 }

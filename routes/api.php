@@ -7,6 +7,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UniversityController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\StatusController;
 
 
 /*
@@ -29,14 +31,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('application', ApplicationController::class);
     Route::post('application/{id}/upload', [ApplicationController::class, 'upload']);
     Route::get('application/{id}/getmedia', [ApplicationController::class, 'getMedia']);
+    Route::post('application/{application}/status/{status}', [ApplicationController::class,'updateStatus']);
+    Route::get('application/{application}/status', [ApplicationController::class,'viewStatus']);
     Route::get('/profile', [AuthController::class, 'profile']);
+    Route::resource('status', StatusController::class);
     Route::post('application/download', [ApplicationController::class, 'downloadMedia']);
+    Route::resource('application.message', MessageController::class)->shallow();
 });
 
 Route::prefix('admin')->group(function () {
     Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
         Route::get('/agent-request', [AuthController::class, 'agent']);
+        Route::get('/agent-verified', [AuthController::class, 'agentVerified']);
         Route::post('/verify-agent/{id}', [AuthController::class, 'verify']);
+        Route::delete('/delete-agent/{id}', [AuthController::class, 'deleteAgent']);
     });
     
     Route::middleware(['auth:sanctum'])->group(function () {
@@ -45,6 +53,6 @@ Route::prefix('admin')->group(function () {
     });
 });
 
-Route::get('/status', function () {
-    return 'ok';
-});
+// Route::get('/status', function () {
+//     return 'ok';
+// });
