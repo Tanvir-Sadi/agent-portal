@@ -18,7 +18,7 @@ class CreateCourseTable extends Migration
             $table->string('name');
             $table->string('level');
             $table->string('link');
-            $table->foreignId('university_id')->constrained();
+            $table->foreignId('university_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

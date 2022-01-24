@@ -15,8 +15,8 @@ class CreateApplicationStatusTable extends Migration
     {
         Schema::create('application_status', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('application_id')->constrained();
-            $table->foreignId('status_id')->constrained();
+            $table->foreignId('application_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('status_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->boolean('status')->nullable()->default(false);
             $table->timestamps();
         });
