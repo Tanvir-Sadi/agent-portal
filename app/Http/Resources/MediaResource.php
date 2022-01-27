@@ -16,10 +16,14 @@ class MediaResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'academic' => MediaTypeResource::collection($this->getMedia('academic')),
+            'cv' => MediaTypeResource::collection($this->getMedia('cv')),
+            'recomendation' => MediaTypeResource::collection($this->getMedia('recomendation')),
+            'refference' => MediaTypeResource::collection($this->getMedia('refference')),
+            'english' => MediaTypeResource::collection($this->getMedia('english')),
+            'work' => MediaTypeResource::collection($this->getMedia('work')),
             'passport' => MediaTypeResource::collection($this->getMedia('passport')),
             'visa' => MediaTypeResource::collection($this->getMedia('visa')),
-            'nid' => MediaTypeResource::collection($this->getMedia('nid')),
-            'cv' => MediaTypeResource::collection($this->getMedia('cv')),
             'sop' => MediaTypeResource::collection($this->getMedia('sop')),
             'conditional' => MediaTypeResource::collection($this->getMedia('conditional')),
             'unconditional' => MediaTypeResource::collection($this->getMedia('unconditional')),

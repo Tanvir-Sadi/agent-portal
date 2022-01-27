@@ -52,6 +52,8 @@ class ApplicationController extends Controller
             'student_email' => 'required|email|string||max:255',
             'student_number' => 'required|string|max:255',
             'student_dob' => 'required|date',
+            'passport_number' => 'string|max:255',
+            'passport_expire_date' => 'date',
             'visa_refusal' => 'required|boolean',
             'nationality' => 'required|string|max:255',
         ]);

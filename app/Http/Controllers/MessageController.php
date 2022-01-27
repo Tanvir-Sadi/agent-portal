@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\Application;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class MessageController extends Controller
 {
@@ -46,6 +47,8 @@ class MessageController extends Controller
             'type' => $request->type,
             'user' => $request->user
         ]);
+        $application->updated_at=Carbon::now();
+        $application->save();
         return $message;
     }
 

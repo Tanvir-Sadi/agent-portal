@@ -25,6 +25,8 @@ class CreateApplicationsTable extends Migration
             $table->string('student_number');
             $table->date('student_dob');
             $table->boolean('visa_refusal');
+            $table->string('passport_number')->nullable()->default('N/A');
+            $table->date('passport_expire_date')->nullable();
             $table->string('nationality');
             $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();

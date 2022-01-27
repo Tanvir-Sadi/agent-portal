@@ -22,15 +22,21 @@ class Application extends Model implements HasMedia
         'student_number',
         'student_dob',
         'visa_refusal',
+        'passport_number',
+        'passport_expire_date',
         'nationality',
     ];
 
     public function registerMediaCollections(): void
     {
+        $this->addMediaCollection('academic');
+        $this->addMediaCollection('cv');
+        $this->addMediaCollection('recomendation');
+        $this->addMediaCollection('refference');
+        $this->addMediaCollection('english');
+        $this->addMediaCollection('work');
         $this->addMediaCollection('passport');
         $this->addMediaCollection('visa');
-        $this->addMediaCollection('nid');
-        $this->addMediaCollection('cv');
         $this->addMediaCollection('sop');
         $this->addMediaCollection('conditional');
         $this->addMediaCollection('unconditional');

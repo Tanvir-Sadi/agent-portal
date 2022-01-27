@@ -45,6 +45,7 @@ class StatusController extends Controller
             ['name'=>'University Interview Completed','order'=>6],
             ['name'=>'CAS Documents','order'=>7],
             ['name'=>'Apply for VISA','order'=>8],
+            ['name'=>'Case Closed','order'=>9],
         ]
         );
 
