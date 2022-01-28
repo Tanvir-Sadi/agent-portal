@@ -24,6 +24,12 @@ class ApplicationController extends Controller
             return ApplicationResource::collection( QueryBuilder::for(Application::class)
             ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake'])
             ->with('user:id,name')
+            ->with(['statuses' => function ($query) {
+                $query
+                ->orderBy('pivot_updated_at', 'desc')
+                ->orderBy('order', 'asc')
+                ->first();
+            }])
             ->orderBy('updated_at','desc')
             ->paginate(6)
         );
@@ -31,6 +37,12 @@ class ApplicationController extends Controller
             return ApplicationResource::collection( QueryBuilder::for(auth()->user()->applications())
             ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake'])
             ->with('user:id,name')
+            ->with(['statuses' => function ($query) {
+                $query
+                ->orderBy('pivot_updated_at', 'desc')
+                ->orderBy('order', 'asc')
+                ->first();
+            }])
             ->orderBy('updated_at','desc')
             ->paginate(6));
         }
