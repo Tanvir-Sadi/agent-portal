@@ -23,26 +23,14 @@ class ApplicationController extends Controller
         if (auth()->user()->roles == 'admin') {
             return ApplicationResource::collection( QueryBuilder::for(Application::class)
             ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake', 'user.name'])
-            ->with([
-                'user:id,name',
-                'statuses'=> function ($query) {
-                    $query->orderBy('pivot_updated_at', 'desc')
-                    ->orderBy('order', 'asc');
-                }])
             ->orderBy('updated_at','desc')
-            ->paginate(6)
+            ->paginate(10)
         );
         } else {
             return ApplicationResource::collection( QueryBuilder::for(auth()->user()->applications())
             ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake'])
-            ->with('user:id,name')
-            ->with(['statuses' => function ($query) {
-                $query
-                ->orderBy('pivot_updated_at', 'desc')
-                ->orderBy('order', 'asc');
-            }])
             ->orderBy('updated_at','desc')
-            ->paginate(6));
+            ->paginate(10));
         }
     }
 
@@ -72,6 +60,13 @@ class ApplicationController extends Controller
         $application->application_id = Carbon::now()->year.$application->id;
         $application->save();
         $application->statuses()->sync(Status::all());
+        $application->messages()->create(
+            [
+                'message' => 'Application Submitted Successfully',
+                'type' => 'Application Submitted',
+                'user' => auth()->user()->getName()
+            ]
+            );
         return $application;
 
     }
@@ -84,6 +79,14 @@ class ApplicationController extends Controller
             $application->addMedia($request->document)->toMediaCollection($request->type);
             $application->updated_at=Carbon::now();
             $application->save();
+            $application->messages()->create(
+                [
+                    'message' => 'Document Uploaded Successfully',
+                    'type' => $request->type.' uploaded',
+                    'user' => auth()->user()->getName()
+                ]
+                );
+            
             return response()->json('Uploaded Successfully',200);
         }else{
             return response()->json('File Not Found',404);
@@ -152,6 +155,13 @@ class ApplicationController extends Controller
         // return response()->json($request->status);
         $application->updated_at=Carbon::now();
         $application->save();
+        $application->messages()->create(
+            [
+                'message' => auth()->user()->getName().' changed Application Status',
+                'type' => $status->name,
+                'user' => auth()->user()->getName()
+            ]
+            );
         return $application->statuses()->updateExistingPivot($status,['status'=>$request->status]);
     }
 

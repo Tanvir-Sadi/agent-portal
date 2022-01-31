@@ -46,6 +46,11 @@ class User extends Authenticatable implements HasMedia
         'email_verified_at' => 'datetime',
     ];
 
+    public function getName()
+    {
+        return $this->name;
+    }
+
     /**
      * Get all of the applications for the User
      *

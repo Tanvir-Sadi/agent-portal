@@ -72,6 +72,6 @@ class Application extends Model implements HasMedia
     {
         return $this->belongsToMany(Status::class)
         ->withTimestamps()
-        ->withPivot(['status']);
+        ->withPivot('status');
     }
 }
