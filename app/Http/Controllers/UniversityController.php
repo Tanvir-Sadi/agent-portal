@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\University;
-
 use Illuminate\Http\Request;
+use App\Http\Requests\UniversityStoreRequest;
+use App\Http\Requests\UniversityUpdateRequest;
 use App\Http\Resources\UniversityResource;
+
+use App\Imports\UniversityImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UniversityController extends Controller
 {
@@ -19,17 +23,20 @@ class UniversityController extends Controller
         $this->authorizeResource(University::class, 'university');
     }
 
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return UniversityResource::collection(University::all());
+        if ($request->input('all'))
+            $university = University::select('name')->get();
+        else
+            $university = University::paginate();
+        
+        return UniversityResource::collection($university);
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -37,26 +44,9 @@ class UniversityController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(UniversityStoreRequest $request)
     {
-
-        $request->validate([
-            'name'=> 'required|string|max:255',
-            'address'=> 'required|string|max:255',
-            'link'=> 'required|string|max:255',
-            'tuitionfees'=> 'required|string|max:255',
-            'intake'=> 'required|string|max:255'
-        ]);
-
-
-        $university = University::create([
-            'name' => $request->name,
-            'address' => $request->address,
-            'link' => $request->link,
-            'tuitionfees' => $request->tuitionfees,
-            'intake' => $request->intake,
-        ]);
-
+        $university = University::create($request->validated());
         return new UniversityResource($university);
     }
 
@@ -78,19 +68,9 @@ class UniversityController extends Controller
      * @param  \App\Models\University  $university
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, University $university)
+    public function update(UniversityUpdateRequest $request, University $university)
     {
-        $request->validate([
-            'name'=> 'string|max:255',
-            'address'=> 'string|max:255',
-            'link'=> 'string|max:255',
-            'tuitionfees'=> 'string|max:255',
-            'intake'=> 'string|max:255'
-        ]);
-        
-        // return $university;
-        $university->update($request->all());
-
+        $university->update($request->validated());
         return new UniversityResource($university);
     }
 
@@ -102,7 +82,14 @@ class UniversityController extends Controller
      */
     public function destroy(University $university)
     {
-        $university->delete();
-        return 'SuccessFully Deleted';
+        $data = $university->delete();
+        return response()->json($data, 202);
+    }
+
+    public function import(Request $request)
+    {
+        if($request->hasFile('importUniversity')){
+            Excel::import(new UniversityImport, $request->importUniversity);
+        }
     }
 }

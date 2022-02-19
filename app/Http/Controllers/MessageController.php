@@ -38,7 +38,7 @@ class MessageController extends Controller
     public function store(Application $application, Request $request)
     {
         $request->validate([
-            'message'=> 'required|string|max:1000',
+            'message'=> 'string|max:1000',
             'type'=> 'required|string|max:255',
             'user'=> 'required|string|max:255',
         ]);

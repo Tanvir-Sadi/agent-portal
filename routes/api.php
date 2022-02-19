@@ -9,6 +9,8 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\StatusController;
+use App\Http\Controllers\IntakeController;
+use App\Http\Controllers\LevelController;
 
 
 /*
@@ -37,6 +39,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('status', StatusController::class);
     Route::post('application/download', [ApplicationController::class, 'downloadMedia']);
     Route::resource('application.message', MessageController::class)->shallow();
+    Route::resource('intake', IntakeController::class);
+    Route::get('/course/search', [CourseController::class,'search']);
+    Route::resource('level', LevelController::class);
+    Route::resource('university', UniversityController::class);
+
 });
 
 Route::prefix('admin')->group(function () {
@@ -48,11 +55,8 @@ Route::prefix('admin')->group(function () {
     });
     
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::resource('university', UniversityController::class);
-        Route::resource('course', CourseController::class);
+        Route::post('university/import', [UniversityController::class,'import']);
+        Route::post('course/import', [CourseController::class,'import']);
+        Route::resource('university.course', CourseController::class)->shallow();
     });
 });
-
-// Route::get('/status', function () {
-//     return 'ok';
-// });

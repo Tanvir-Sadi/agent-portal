@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+// use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+
 
 class University extends Model
 {
@@ -14,7 +16,6 @@ class University extends Model
         'address',
         'link',
         'tuitionfees',
-        'intake',
     ];
 
     /**
@@ -22,7 +23,6 @@ class University extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    
     public function courses()
     {
         return $this->hasMany(Course::class);

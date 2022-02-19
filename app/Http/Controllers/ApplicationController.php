@@ -25,12 +25,16 @@ class ApplicationController extends Controller
             ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake', 'user.name'])
             ->orderBy('updated_at','desc')
             ->paginate(10)
+            ->appends(request()->query())
         );
         } else {
-            return ApplicationResource::collection( QueryBuilder::for(auth()->user()->applications())
-            ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake'])
-            ->orderBy('updated_at','desc')
-            ->paginate(10));
+            return ApplicationResource::collection( 
+                QueryBuilder::for(auth()->user()->applications())
+                ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake'])
+                ->orderBy('updated_at','desc')
+                ->paginate(10)
+                ->appends(request()->query())
+            );
         }
     }
 
@@ -99,12 +103,6 @@ class ApplicationController extends Controller
         return new MediaResource($application);
     }
 
-    public function downloadMedia(Request $request)
-    {
-        // return $request->name;
-        return Storage::disk('public')->download($request->name);
-    }
-
     /**
      * Display the specified resource.
      *
@@ -152,7 +150,6 @@ class ApplicationController extends Controller
             'status' => 'required|boolean'
         ]);
 
-        // return response()->json($request->status);
         $application->updated_at=Carbon::now();
         $application->save();
         $application->messages()->create(
@@ -174,6 +171,6 @@ class ApplicationController extends Controller
     public function destroy(Application $application)
     {
         $application->delete();
-        return response()->json('Successfully Deleted', 200);
+        return response()->json('Successfully Deleted', 202);
     }
 }

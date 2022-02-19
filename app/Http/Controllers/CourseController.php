@@ -3,8 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\University;
 use Illuminate\Http\Request;
+use App\Http\Requests\CourseStoreRequest;
+use App\Http\Requests\CourseUpdateRequest;
 use App\Http\Resources\CourseResource;
+
+
+use App\Imports\CourseImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class CourseController extends Controller
 {
@@ -23,9 +31,12 @@ class CourseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($university)
     {
-        return CourseResource::collection(Course::all());
+        if($university==0){
+            return CourseResource::collection(Course::with(['intakes:id,name','levels', 'university:id,name',])->paginate());
+        }
+        return CourseResource::collection(University::find($university)->courses()->with(['intakes:id,name', 'university:id,name', 'levels:id,name'])->paginate());
     }
 
 
@@ -35,23 +46,10 @@ class CourseController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(University $university, CourseStoreRequest $request)
     {
-        $request->validate([
-            'name'=> 'required|string|max:255',
-            'level'=> 'required|string|max:255',
-            'link'=> 'required|string|max:255',
-            'university_id'=> 'required|integer',
-        ]);
-
-        $course = Course::create([
-            'name' => $request->name,
-            'level' => $request->level,
-            'link' => $request->link,
-            'university_id' => $request->university_id,
-        ]);
-        return $course = Course::where('name', $course->name)->firstOrFail();
-        // return new CourseResource($course);
+        $course = $university->courses()->create($request->validated());
+        return new CourseResource($course);
     }
 
     /**
@@ -72,18 +70,9 @@ class CourseController extends Controller
      * @param  \App\Models\Course  $course
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Course $course)
+    public function update(CourseUpdateRequest $request, Course $course)
     {
-        $request->validate([
-            'name'=> 'string|max:255',
-            'level'=> 'string|max:255',
-            'link'=> 'string|max:255',
-            'university_id'=> 'integer'
-        ]);
-
-        // return $course;
-        $course->update($request->all());
-
+        $course->update($request->validated());
         return new CourseResource($course);
     }
 
@@ -96,6 +85,21 @@ class CourseController extends Controller
     public function destroy(Course $course)
     {
         $course->delete();
-        return 'SuccessFully Deleted';
+        return response()->json('SuccessFully Deleted', 202,);
+    }
+
+    public function import(Request $request)
+    {
+        if($request->hasFile('importCourse')){
+            Excel::import(new CourseImport, $request->importCourse);
+        }
+    }
+
+    public function search()
+    {
+        return QueryBuilder::for(Course::class)
+        ->select(['name'])
+        ->allowedFilters(['university.name', 'intakes.name', 'levels.name'])
+        ->get();
     }
 }
