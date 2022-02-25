@@ -63,6 +63,17 @@ class Application extends Model implements HasMedia
     {
         return $this->hasMany(Message::class);
     }
+
+    /**
+     * Get all of the messages for the Application
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function lastMessage()
+    {
+        return $this->hasOne(Message::class)->latest();
+    }
+
     /**
      * The statuses that belong to the Application
      *

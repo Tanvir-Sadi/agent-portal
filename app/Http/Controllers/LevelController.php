@@ -13,12 +13,23 @@ class LevelController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return QueryBuilder::for(Level::class)
-        ->select(['name'])
-        ->allowedFilters(['courses.university.name', 'courses.intakes.name'])
-        ->get();
+        // return QueryBuilder::for(Level::class)
+        // ->select(['name'])
+        // ->allowedFilters(['courses.university.name', 'courses.intakes.name'])
+        // ->get();
+
+        return Level::select(['name'])
+            ->whereHas('courses',function($courseQ) use($request){
+                $courseQ->whereHas('university', function($universityQ) use($request){
+                    $universityQ->where('name',$request->input('university'));
+                })
+                ->whereHas('intakes', function($intakesQ) use($request){
+                    $intakesQ->where('name',$request->input('intake'));
+                });
+            })
+            ->get();
     }
 
     /**

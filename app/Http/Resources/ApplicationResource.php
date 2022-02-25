@@ -29,8 +29,8 @@ class ApplicationResource extends JsonResource
             'passport_number' =>$this->passport_number,
             'passport_expire_date' =>$this->passport_expire_date,
             'nationality' =>$this->nationality,
-            'user'=>$this->user()->first()->getName(),
-            'message'=>$this->messages()->latest()->first(),
+            'user'=>$this->user->name,
+            'message'=>$this->lastMessage,
             'updated_at'=>$this->updated_at
         ];
     }

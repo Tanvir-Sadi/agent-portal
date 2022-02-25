@@ -28,6 +28,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/logout', [AuthController::class,'logout']);
     Route::post('uploadasagent', [AuthController::class, 'uploadMediaAsAgent']);
     Route::get('getasagent', [AuthController::class, 'getMediaAsAgent']);
     Route::resource('application', ApplicationController::class);

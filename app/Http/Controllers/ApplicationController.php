@@ -21,12 +21,14 @@ class ApplicationController extends Controller
     public function index()
     {
         if (auth()->user()->roles == 'admin') {
-            return ApplicationResource::collection( QueryBuilder::for(Application::class)
-            ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake', 'user.name'])
-            ->orderBy('updated_at','desc')
-            ->paginate(10)
-            ->appends(request()->query())
-        );
+            return ApplicationResource::collection(
+                QueryBuilder::for(Application::class)
+                ->with(['user:id,name', 'lastMessage'])
+                ->allowedFilters(['application_id', 'student_name','university_name','course_name', 'course_level', 'course_intake', 'user.name'])
+                ->orderBy('updated_at','desc')
+                ->paginate(10)
+                ->appends(request()->query())
+            );
         } else {
             return ApplicationResource::collection( 
                 QueryBuilder::for(auth()->user()->applications())
@@ -83,14 +85,6 @@ class ApplicationController extends Controller
             $application->addMedia($request->document)->toMediaCollection($request->type);
             $application->updated_at=Carbon::now();
             $application->save();
-            $application->messages()->create(
-                [
-                    'message' => 'Document Uploaded Successfully',
-                    'type' => $request->type.' uploaded',
-                    'user' => auth()->user()->getName()
-                ]
-                );
-            
             return response()->json('Uploaded Successfully',200);
         }else{
             return response()->json('File Not Found',404);

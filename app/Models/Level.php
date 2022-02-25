@@ -19,5 +19,4 @@ class Level extends Model
     {
         return $this->belongsToMany(Course::class);
     }
-
 }

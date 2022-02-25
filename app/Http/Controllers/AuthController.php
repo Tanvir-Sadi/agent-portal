@@ -56,7 +56,7 @@ class AuthController extends Controller
         return new UserResource($user,$token);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
         auth()->user()->tokens()->delete();
         $response = [
