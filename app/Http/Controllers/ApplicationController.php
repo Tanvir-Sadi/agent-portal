@@ -68,8 +68,8 @@ class ApplicationController extends Controller
         $application->statuses()->sync(Status::all());
         $application->messages()->create(
             [
-                'message' => 'Application Submitted Successfully',
-                'type' => 'Application Submitted',
+                'message' => 'Application has been received. It will be reviewed shortly.',
+                'type' => 'Application Under Review',
                 'user' => auth()->user()->getName()
             ]
             );
