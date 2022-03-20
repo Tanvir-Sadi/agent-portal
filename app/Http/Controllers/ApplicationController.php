@@ -10,6 +10,7 @@ use App\Http\Resources\ApplicationResource;
 use App\Http\Resources\MediaResource;
 use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ApplicationController extends Controller
 {
@@ -91,11 +92,6 @@ class ApplicationController extends Controller
         }
     }
 
-    public function getMedia($id)
-    {
-        $application = Application::find($id);
-        return new MediaResource($application);
-    }
 
     /**
      * Display the specified resource.
@@ -167,4 +163,16 @@ class ApplicationController extends Controller
         $application->delete();
         return response()->json('Successfully Deleted', 202);
     }
+
+    public function destroyMedia(Media $media)
+    {
+        return $media->delete();
+    }
+
+    public function getMedia($id)
+    {
+        $application = Application::find($id);
+        return new MediaResource($application);
+    }
+
 }

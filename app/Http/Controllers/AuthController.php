@@ -58,13 +58,10 @@ class AuthController extends Controller
 
     public function logout()
     {
-        auth()->user()->tokens()->delete();
-        $response = [
-            'messege' =>'Logout Successfull'
-        ];
+        if (auth()->user())
+            auth()->user()->tokens()->delete();
         
-        return response($response, 201);
-
+        return response()->json('Logout Successfull', 200);
     }
 
     public function agent()

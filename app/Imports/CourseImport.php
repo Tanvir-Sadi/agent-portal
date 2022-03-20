@@ -29,7 +29,7 @@ class CourseImport implements ToCollection, WithHeadingRow
             $university = $this->universities->where('name', $row['university'])->first();           
             $intakeId= array();
             $levelId= array();
-
+           
             $course = Course::create([
                 'university_id'=>$university->id,
                 'name' =>$row['name'],

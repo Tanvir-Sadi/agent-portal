@@ -26,25 +26,25 @@ use App\Http\Controllers\LevelController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/logout', [AuthController::class,'logout']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/logout', [AuthController::class,'logout']);
     Route::post('uploadasagent', [AuthController::class, 'uploadMediaAsAgent']);
     Route::get('getasagent', [AuthController::class, 'getMediaAsAgent']);
-    Route::resource('application', ApplicationController::class);
     Route::post('application/{id}/upload', [ApplicationController::class, 'upload']);
-    Route::get('application/{id}/getmedia', [ApplicationController::class, 'getMedia']);
+    Route::delete('/media/{media}', [ApplicationController::class, 'destroyMedia']);
     Route::post('application/{application}/status/{status}', [ApplicationController::class,'updateStatus']);
     Route::get('application/{application}/status', [ApplicationController::class,'viewStatus']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::resource('status', StatusController::class);
+    Route::get('application/{id}/getmedia', [ApplicationController::class, 'getMedia']);
     Route::post('application/download', [ApplicationController::class, 'downloadMedia']);
     Route::resource('application.message', MessageController::class)->shallow();
+    Route::resource('application', ApplicationController::class);
     Route::resource('intake', IntakeController::class);
     Route::get('/course/search', [CourseController::class,'search']);
     Route::resource('level', LevelController::class);
     Route::resource('university', UniversityController::class);
-
 });
 
 Route::prefix('admin')->group(function () {
