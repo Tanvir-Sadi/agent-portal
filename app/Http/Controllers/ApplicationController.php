@@ -11,6 +11,7 @@ use App\Http\Resources\MediaResource;
 use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\MediaLibrary\Support\MediaStream;
 
 class ApplicationController extends Controller
 {
@@ -173,6 +174,14 @@ class ApplicationController extends Controller
     {
         $application = Application::find($id);
         return new MediaResource($application);
+    }
+
+    public function downloadAll(Application $application)
+    {
+        return MediaStream::create($application->application_id.$application->student_name.'.zip')->addMedia(
+            $application->media->filter(function(Media $media) {
+            return in_array($media->collection_name, ['academic', 'cv', 'recomendation', 'refference', 'english', 'passport', 'work', 'visa', 'sop', 'conditional', 'unconditional', 'other']);
+        }));
     }
 
 }

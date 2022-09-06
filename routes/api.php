@@ -27,6 +27,7 @@ use App\Http\Controllers\LevelController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class,'logout']);
+Route::get('application/{application}/downloadall', [ApplicationController::class, 'downloadAll']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('uploadasagent', [AuthController::class, 'uploadMediaAsAgent']);
