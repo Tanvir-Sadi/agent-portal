@@ -60,4 +60,14 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany(Application::class);
     }
+
+        /**
+     * Get all of the documents for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
 }

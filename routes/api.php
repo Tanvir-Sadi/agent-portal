@@ -11,6 +11,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\IntakeController;
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\DocumentController;
 
 
 /*
@@ -50,6 +51,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 Route::prefix('admin')->group(function () {
     Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+        Route::post('/document/{id}/download', [DocumentController::class, 'download']);
+        Route::post('/document/{id}/upload', [DocumentController::class, 'upload']);
+        Route::resource('document', DocumentController::class);
         Route::get('/agent-request', [AuthController::class, 'agent']);
         Route::get('/agent-verified', [AuthController::class, 'agentVerified']);
         Route::post('/verify-agent/{id}', [AuthController::class, 'verify']);
