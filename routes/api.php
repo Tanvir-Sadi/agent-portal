@@ -53,6 +53,7 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
         Route::post('/document/{id}/download', [DocumentController::class, 'download']);
         Route::post('/document/{id}/upload', [DocumentController::class, 'upload']);
+        Route::get('/document/search', [DocumentController::class, 'search']);
         Route::resource('document', DocumentController::class);
         Route::get('/agent-request', [AuthController::class, 'agent']);
         Route::get('/agent-verified', [AuthController::class, 'agentVerified']);

@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\Support\MediaStream;
+use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Support\Facades\DB;
 
 
 class DocumentController extends Controller
@@ -17,7 +19,7 @@ class DocumentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $document = Document::whereIsRoot()->with(
             ['documents'=>function($q){
@@ -28,6 +30,31 @@ class DocumentController extends Controller
                 $q->orderBy('_lft','asc');
             }])->first();
         return response()->json($document, 200);
+    }
+
+    public function search(Request $request)
+    {
+        $document = Document::where('name','like','%'.$request->input('name').'%')
+            ->orderBy('updated_at','desc')
+            ->orderBy('name','asc')
+            ->get();
+
+        $media = DB::table('media')->where(
+            [
+                ['model_type', 'App\Models\Document'],
+                ['file_name','like','%'.$request->input('name').'%']
+            ])
+            ->orderBy('updated_at','desc')
+            ->orderBy('file_name','asc')
+            ->get();
+        
+        $result = [
+            'name'=>'Showing Searched Result for "'.$request->input('name').'"',
+            'documents'=>$document,
+            'media'=>$media,
+            'ancestors'=>[]
+        ];
+        return response()->json($result, 200);
     }
 
 
@@ -107,10 +134,14 @@ class DocumentController extends Controller
     {
         if ($request->hasFile('document')) {
             $document = Document::find($id);
-            $document->addMedia($request->document)->toMediaCollection();
+            $fileAdders = $document
+                ->addMultipleMediaFromRequest(['document'])
+                ->each(function ($fileAdder) {
+                    $fileAdder->toMediaCollection();
+                });
             $document->updated_at=Carbon::now();
             $document->save();
-            return response()->json('Uploaded Successfully',200);
+            return response()->json($document->getMedia(),200);
         }else{
             return response()->json('File Not Found',404);
         }
@@ -118,7 +149,6 @@ class DocumentController extends Controller
 
     public function download(Request $request, $id)
     {
-        
         $media = Media::where('id',$id)->first();
         return $media->toResponse($request);
         $headers = [
