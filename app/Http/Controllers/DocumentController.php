@@ -19,16 +19,14 @@ class DocumentController extends Controller
      */
     public function index()
     {
-        
-        $document = Document::where('document_id',null)->with(
+        $document = Document::whereIsRoot()->with(
             ['documents'=>function($q){
                 $q->orderBy('updated_at','desc')
                 ->orderBy('name','asc');
-            },'media', 
-            'ancestorsAndSelf'=>function($q){
-                $q->orderBy('depth','asc');
-            }]
-        )->first();
+            },'media',
+            'ancestors'=>function($q){
+                $q->orderBy('_lft','asc');
+            }])->first();
         return response()->json($document, 200);
     }
 
@@ -47,14 +45,11 @@ class DocumentController extends Controller
         ]);
 
         if ($request->exists('document_id')) {
-            $document = auth()->user()->documents()->create($request->all());
+            $document = auth()->user()->documents()->create(['name'=>$request->name]);
+            Document::find($request->document_id)->appendNode($document);
         }else{
-            $document = auth()->user()->documents()->create(
-                [
-                    'name' => $request->name,
-                    'document_id'=> Document::where('document_id',null)->first()->id
-                ]
-            );
+            $document = auth()->user()->documents()->create(['name'=>$request->name]);
+            Document::whereIsRoot()->first()->appendNode($document);
         }
 
         return response()->json($document, 200);
@@ -72,11 +67,10 @@ class DocumentController extends Controller
             ['documents'=>function($q){
                 $q->orderBy('updated_at','desc');
             },
-            'media', 
-            'ancestorsAndSelf'=>function($q){
-                $q->orderBy('depth','asc');
-            }
-            ])->first();
+            'media',
+            'ancestors'=>function($q){
+                $q->orderBy('_lft','asc');
+            }])->first();
         return response()->json($result, 200);
     }
 

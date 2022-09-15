@@ -18,6 +18,8 @@ class CreateDocumentsTable extends Migration
             $table->string('name');
             $table->foreignId('document_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->unsignedInteger('_lft');
+            $table->unsignedInteger('_rgt');
             $table->timestamps();
         });
     }

@@ -6,14 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use \Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
+use Kalnoy\Nestedset\NodeTrait;
 
 class Document extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, HasRecursiveRelationships;
+    use HasFactory, InteractsWithMedia, NodeTrait;
     protected $fillable = [
         'name',
-        'document_id',
     ];
 
     /**
@@ -46,8 +45,15 @@ class Document extends Model implements HasMedia
         return $this->belongsTo(User::class);
     }
 
-    public function getParentKeyName()
+    public function getParentIdName()
     {
         return 'document_id';
     }
+
+    // Specify parent id attribute mutator
+    public function setParentAttribute($value)
+    {
+        $this->setParentIdAttribute($value);
+    }
+
 }
