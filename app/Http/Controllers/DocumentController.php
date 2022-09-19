@@ -132,6 +132,10 @@ class DocumentController extends Controller
 
     public function upload(Request $request, $id)
     {
+        $request->validate([
+            'document.*' => 'file|max:102400',
+        ]);
+
         if ($request->hasFile('document')) {
             $document = Document::find($id);
             $fileAdders = $document

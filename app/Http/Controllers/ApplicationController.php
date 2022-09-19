@@ -82,9 +82,18 @@ class ApplicationController extends Controller
 
     public function upload(Request $request, $id)
     {
+        $request->validate([
+            'document.*' => 'file|max:10240',
+            'type' => 'required'
+        ]);
+        
         if ($request->hasFile('document')) {
             $application = Application::find($id);
-            $application->addMedia($request->document)->toMediaCollection($request->type);
+            $fileAdders = $application
+                ->addMultipleMediaFromRequest(['document'])
+                ->each(function ($fileAdder) use($request) {
+                    $fileAdder->toMediaCollection($request->type);
+                });
             $application->updated_at=Carbon::now();
             $application->save();
             return response()->json('Uploaded Successfully',200);
@@ -178,7 +187,7 @@ class ApplicationController extends Controller
 
     public function downloadAll(Application $application)
     {
-        return MediaStream::create($application->application_id.$application->student_name.'.zip')->addMedia(
+        return MediaStream::create($application->application_id.' '.$application->student_name.'.zip')->addMedia(
             $application->media->filter(function(Media $media) {
             return in_array($media->collection_name, ['academic', 'cv', 'recomendation', 'refference', 'english', 'passport', 'work', 'visa', 'sop', 'conditional', 'unconditional', 'other']);
         }));
