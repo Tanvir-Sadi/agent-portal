@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use App\Models\Application;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Notifications\NewMessage;
+use Illuminate\Support\Facades\Notification;
 
 class MessageController extends Controller
 {
@@ -49,6 +52,11 @@ class MessageController extends Controller
         ]);
         $application->updated_at=Carbon::now();
         $application->save();
+        $users=User::where([['roles','admin'], ['id', '!=',auth()->user()->id],])
+                            ->orWhere([['id', $application->user->id], ['id', '!=',auth()->user()->id],])
+                            ->get();
+
+        Notification::send($users, new NewMessage($message));
         return $message;
     }
 

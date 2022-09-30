@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Document;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Http\Response;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\Support\MediaStream;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -17,14 +19,14 @@ class DocumentController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
+     * ponse
      */
     public function index(Request $request)
     {
         $document = Document::whereIsRoot()->with(
             ['documents'=>function($q){
-                $q->orderBy('updated_at','desc')
-                ->orderBy('name','asc');
+                $q->orderBy('name','asc');
             },'media',
             'ancestors'=>function($q){
                 $q->orderBy('_lft','asc');
@@ -35,19 +37,17 @@ class DocumentController extends Controller
     public function search(Request $request)
     {
         $document = Document::where('name','like','%'.$request->input('name').'%')
-            ->orderBy('updated_at','desc')
             ->orderBy('name','asc')
             ->get();
 
-        $media = DB::table('media')->where(
-            [
-                ['model_type', 'App\Models\Document'],
-                ['file_name','like','%'.$request->input('name').'%']
-            ])
-            ->orderBy('updated_at','desc')
+        $media = DB::table('media')->where('model_type', 'App\Models\Document')
+            ->where(function ($q) use($request){
+                $q->where('file_name','like','%'.$request->input('name').'%')
+                    ->orWhere('name','like','%'.$request->input('name').'%');
+            })
             ->orderBy('file_name','asc')
             ->get();
-        
+
         $result = [
             'name'=>'Showing Searched Result for "'.$request->input('name').'"',
             'documents'=>$document,
@@ -61,8 +61,8 @@ class DocumentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
@@ -85,14 +85,13 @@ class DocumentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Document  $document
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function show($document)
     {
         $result = Document::where('id', $document)->with(
             ['documents'=>function($q){
-                $q->orderBy('updated_at','desc');
+                $q->orderBy('name','asc');
             },
             'media',
             'ancestors'=>function($q){
@@ -104,9 +103,9 @@ class DocumentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Document  $document
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param Document $document
+     * @return JsonResponse
      */
     public function update(Request $request, Document $document)
     {
@@ -121,8 +120,8 @@ class DocumentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Document  $document
-     * @return \Illuminate\Http\Response
+     * @param Document $document
+     * @return JsonResponse
      */
     public function destroy(Document $document)
     {
@@ -130,14 +129,20 @@ class DocumentController extends Controller
         return response()->json("Successfully Deleted", 200);
     }
 
-    public function upload(Request $request, $id)
+    /**
+     * Upload documents from request.
+     *
+     * @param Request $request
+     * @param Document $document
+     * @return JsonResponse
+     */
+    public function upload(Request $request, Document $document)
     {
         $request->validate([
             'document.*' => 'file|max:102400',
         ]);
 
         if ($request->hasFile('document')) {
-            $document = Document::find($id);
             $fileAdders = $document
                 ->addMultipleMediaFromRequest(['document'])
                 ->each(function ($fileAdder) {
@@ -146,27 +151,21 @@ class DocumentController extends Controller
             $document->updated_at=Carbon::now();
             $document->save();
             return response()->json($document->getMedia(),200);
-        }else{
-            return response()->json('File Not Found',404);
         }
+
+        return response()->json('File Not Found',404);
     }
 
-    public function download(Request $request, $id)
-    {
-        $media = Media::where('id',$id)->first();
-        return $media->toResponse($request);
-        $headers = [
-            'Content-Type' => $media->mime_type,
-         ];
-        return response()->json($media->getpath());
+    public function renameMedia(Request $request ,Media $media){
+        $request->validate([
 
+        ]);
+        $media->name = str_replace(['#', '/', '\\', ' '], '-',$media->name);
+        $replaced_name = str_replace(['#', '/', '\\', ' '], '-',$request->name);
+        $media->file_name = str_replace($media->name, $replaced_name, $media->file_name);
+        $media->name = $request->name;
+        $media->save();
+        return response()->json($media,200);
     }
 
-
-    public function breadcrumb(Document $document)
-    {
-        $document->with(['document'=>function($q){
-            $q->with('document');
-        }]);
-    }
 }

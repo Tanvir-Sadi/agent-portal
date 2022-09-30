@@ -4,12 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Notifications\Notifiable;
 
 class Application extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, Notifiable;
 
     protected $fillable = [
         'application_id',
@@ -46,7 +52,7 @@ class Application extends Model implements HasMedia
     /**
      * Get the user that owns the Application
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
@@ -57,7 +63,7 @@ class Application extends Model implements HasMedia
     /**
      * Get all of the messages for the Application
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function messages()
     {
@@ -67,7 +73,7 @@ class Application extends Model implements HasMedia
     /**
      * Get all of the messages for the Application
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasOne
      */
     public function lastMessage()
     {
@@ -77,7 +83,7 @@ class Application extends Model implements HasMedia
     /**
      * The statuses that belong to the Application
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function statuses()
     {

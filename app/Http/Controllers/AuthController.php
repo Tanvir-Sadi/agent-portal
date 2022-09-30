@@ -115,4 +115,9 @@ class AuthController extends Controller
         $user = auth()->user();
         return MediaTypeResource::collection($user->getMedia());
     }
+
+    public function notification()
+    {
+        return auth()->user()->unreadNotifications;
+    }
 }

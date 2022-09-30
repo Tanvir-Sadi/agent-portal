@@ -31,6 +31,7 @@ Route::get('/logout', [AuthController::class,'logout']);
 Route::get('application/{application}/downloadall', [ApplicationController::class, 'downloadAll']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('notification', [AuthController::class, 'notification']);
     Route::post('uploadasagent', [AuthController::class, 'uploadMediaAsAgent']);
     Route::get('getasagent', [AuthController::class, 'getMediaAsAgent']);
     Route::post('application/{id}/upload', [ApplicationController::class, 'upload']);
@@ -39,7 +40,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('application/{application}/status', [ApplicationController::class,'viewStatus']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::resource('status', StatusController::class);
-    Route::get('application/{id}/getmedia', [ApplicationController::class, 'getMedia']);
+    Route::get('application/{application}/getmedia', [ApplicationController::class, 'getMedia']);
     Route::post('application/download', [ApplicationController::class, 'downloadMedia']);
     Route::resource('application.message', MessageController::class)->shallow();
     Route::resource('application', ApplicationController::class);
@@ -51,8 +52,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 Route::prefix('admin')->group(function () {
     Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-        Route::post('/document/{id}/download', [DocumentController::class, 'download']);
-        Route::post('/document/{id}/upload', [DocumentController::class, 'upload']);
+        Route::post('/document/{document}/upload', [DocumentController::class, 'upload']);
+        Route::post('/document/{media}/rename', [DocumentController::class, 'renameMedia']);
         Route::get('/document/search', [DocumentController::class, 'search']);
         Route::resource('document', DocumentController::class);
         Route::get('/agent-request', [AuthController::class, 'agent']);
@@ -60,7 +61,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/verify-agent/{id}', [AuthController::class, 'verify']);
         Route::delete('/delete-agent/{id}', [AuthController::class, 'deleteAgent']);
     });
-    
+
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('university/import', [UniversityController::class,'import']);
         Route::post('course/import', [CourseController::class,'import']);
